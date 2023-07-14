@@ -55,6 +55,11 @@ public class GameController : MonoBehaviour
     {
         if (selectedID != -1)
         {
+            Debug.Log(selectedID);
+            Transform checker = tiles[selectedID].transform.GetChild(0);
+            checker.SetParent(tiles[tileID].transform, false);
+            checker.transform.position = tiles[tileID].transform.position;
+            checker.GetComponent<CheckerData>().parentTileID = tileID;
             selectedID = -1;
         }
         return;

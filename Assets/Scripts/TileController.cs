@@ -50,7 +50,6 @@ public class TileController : MonoBehaviour
         {
             spriteRenderer.color = new Color(
                 highlightColor.r / highlightScale, highlightColor.g / highlightScale, highlightColor.b / highlightScale);
-
         }
 
         highlighted = true;
