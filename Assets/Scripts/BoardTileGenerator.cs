@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Script1 : MonoBehaviour
+public class BoardTileGenerator : MonoBehaviour
 {
+    [SerializeField] public GameObject Tile;
     // Start is called before the first frame update
     void Start()
     {

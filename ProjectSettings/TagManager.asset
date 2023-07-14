@@ -41,3 +41,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Tiles
+    uniqueID: 1901737101
+    locked: 0
+  - name: Checkers
+    uniqueID: 2621878675
+    locked: 0
