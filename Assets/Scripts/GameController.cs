@@ -60,11 +60,8 @@ public class GameController : MonoBehaviour
     {
 
         // Return all moves as valid for now
-        int[] ret = new int[64];
-        for(int i = 0; i < 64; i++)
-        {
-            ret[i] = i;
-        }
+        int[] ret = new int[1];
+        ret[0] = tileID + 8;
 
         return ret;
     }

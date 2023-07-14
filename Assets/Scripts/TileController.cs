@@ -31,7 +31,7 @@ public class TileController : MonoBehaviour
     private void OnMouseUp()
     {
         Debug.Log("clicked tile");
-        gameController.SelectChecker(id);
+        gameController.SelectTile(id);
         if (highlighted)
         {
             StopHighlight();
