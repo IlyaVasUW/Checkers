@@ -7,10 +7,11 @@ public class CheckerData : MonoBehaviour
 {
     public int parentTileID;
     public CheckerColor color;
+    public bool promoted;
     // Start is called before the first frame update
     void Start()
     {
-
+        promoted = false;
     }
 
     // Update is called once per frame
