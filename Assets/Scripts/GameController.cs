@@ -53,6 +53,10 @@ public class GameController : MonoBehaviour
 
     public void SelectTile(int tileID)
     {
+        if (selectedID != -1)
+        {
+            selectedID = -1;
+        }
         return;
     }
 
