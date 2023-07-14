@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5442588527543310689}
   - component: {fileID: 1727970677690544371}
+  - component: {fileID: 7287935827510699814}
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
@@ -75,7 +76,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.5283019, g: 0.5283019, b: 0.5283019, a: 1}
+  m_Color: {r: 0.5283019, g: 0.5283019, b: 0.5283019, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -85,6 +86,21 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &7287935827510699814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 177333950687577250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7348e88637ae7754fbf23aad9989b438, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Tile: {fileID: 6415282848869800359, guid: 6a0acf096d30a8a449df86005a047e78, type: 3}
+  tileColor: {r: 0.9528302, g: 0.8039784, b: 0.644209, a: 1}
+  colorScale: 4
 --- !u!1001 &9077163839026996613
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -111,15 +127,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2553985365360277189, guid: 6a0acf096d30a8a449df86005a047e78, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.4375
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2553985365360277189, guid: 6a0acf096d30a8a449df86005a047e78, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.4375
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2553985365360277189, guid: 6a0acf096d30a8a449df86005a047e78, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.1
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 2553985365360277189, guid: 6a0acf096d30a8a449df86005a047e78, type: 3}
       propertyPath: m_LocalRotation.w
@@ -154,16 +170,20 @@ PrefabInstance:
       value: Tile
       objectReference: {fileID: 0}
     - target: {fileID: 8755775275806615863, guid: 6a0acf096d30a8a449df86005a047e78, type: 3}
+      propertyPath: m_Color.a
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8755775275806615863, guid: 6a0acf096d30a8a449df86005a047e78, type: 3}
       propertyPath: m_Color.b
-      value: 1
+      value: 0.21960786
       objectReference: {fileID: 0}
     - target: {fileID: 8755775275806615863, guid: 6a0acf096d30a8a449df86005a047e78, type: 3}
       propertyPath: m_Color.g
-      value: 1
+      value: 0.21960786
       objectReference: {fileID: 0}
     - target: {fileID: 8755775275806615863, guid: 6a0acf096d30a8a449df86005a047e78, type: 3}
       propertyPath: m_Color.r
-      value: 1
+      value: 0.21960786
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
