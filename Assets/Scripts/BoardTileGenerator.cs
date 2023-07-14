@@ -8,6 +8,7 @@ public class BoardTileGenerator : MonoBehaviour
     [SerializeField] public GameObject Tile;
     [SerializeField] public GameObject Checker;
     public Color tileColor = new Color(255, 255, 255);
+    public Color highlightColor = new Color(255, 255, 100);
     public int colorScale = 3;
     private GameController gameController;
 
@@ -15,10 +16,11 @@ public class BoardTileGenerator : MonoBehaviour
     {
         gameController = GetComponent<GameController>();
 
-        Dictionary<int, GameObject> tiles = new Dictionary<int, GameObject>();
+        gameController.tiles = new Dictionary<int, GameObject>();
         Color darkColor = new Color(tileColor.r / colorScale, tileColor.g / colorScale, tileColor.b / colorScale);
         Color checkerRed = new Color(180, 0, 0);
         Color checkerBlack = new Color(0, 0, 0);
+
         for(int i = 0; i < 8; i++)
         {
             for(int j = 0; j < 8; j++)
@@ -34,11 +36,9 @@ public class BoardTileGenerator : MonoBehaviour
                     CreateChecker(tile, tileID, tileID < 24, checkerRed, checkerBlack);
                 }
 
-                tiles.Add(tileID, tile);
+                gameController.tiles.Add(tileID, tile);
             }
         }
-
-        gameController.tiles = tiles;
     }
 
     GameObject CreateTile(int i, int j, bool isDarkSquare, int tileID, Color darkColor)
@@ -64,6 +64,11 @@ public class BoardTileGenerator : MonoBehaviour
 
         tileController.id = tileID;
         tileController.gameController = gameController;
+        tileController.color = isDarkSquare ? TileColor.Dark : TileColor.Light;
+        tileController.baseColor = new Color(tileColor.r, tileColor.g, tileColor.b);
+        tileController.highlightColor = new Color(highlightColor.r, highlightColor.g, highlightColor.b);
+        tileController.colorScale = colorScale;
+
         tile.name = "Tile " + tileID;
 
         return tile;

@@ -303,6 +303,18 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0.1
       objectReference: {fileID: 0}
+    - target: {fileID: 7287935827510699814, guid: 89fb784f12b6428409030b0f58aa1e12, type: 3}
+      propertyPath: highlightColor.b
+      value: 0.39215687
+      objectReference: {fileID: 0}
+    - target: {fileID: 7287935827510699814, guid: 89fb784f12b6428409030b0f58aa1e12, type: 3}
+      propertyPath: highlightColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7287935827510699814, guid: 89fb784f12b6428409030b0f58aa1e12, type: 3}
+      propertyPath: highlightColor.r
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
