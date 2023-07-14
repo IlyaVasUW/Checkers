@@ -27,76 +27,70 @@ public class BoardTileGenerator : MonoBehaviour
 
                 bool isDarkSquare = (i + j) % 2 == 0;
 
-                Vector3 scale = transform.localScale / 8;
-                float startX = transform.localScale.x * -0.5f - scale.x / 2;
-                float startY = transform.localScale.y * -0.5f - scale.y / 2;
+                GameObject tile = CreateTile(i, j, isDarkSquare, tileID, darkColor);
 
-                float positionX = (startX + ((scale.x) * (j + 1)));
-                float positionY = (startY + ((scale.y) * (i + 1)));
-                float positionZ = -0.1f;
-
-                GameObject tile = Instantiate(Tile, new Vector3(positionX, positionY, positionZ), Quaternion.identity, transform);
-                tile.transform.localScale = scale / 8;
-                SpriteRenderer tileRenderer= tile.GetComponent<SpriteRenderer>();
-                TileController tileController = tile.GetComponent<TileController>();
-
-                tileRenderer.color = isDarkSquare ?
-                    new Color(darkColor.r, darkColor.g, darkColor.b) : new Color(tileColor.r, tileColor.g, tileColor.b);
-                tileRenderer.sortingLayerName = "Tiles";
-
-                tileController.id = tileID;
-                tileController.gameController = gameController;
-                tile.name = "Tile " + tileID;
-
-                if (tileID < 24 && isDarkSquare)
+                if ((tileID < 24 || tileID >= 40) && isDarkSquare)
                 {
-                    GameObject checker = Instantiate(Checker, 
-                        new Vector3(tile.transform.position.x, tile.transform.position.y, tile.transform.position.z - 0.1f), 
-                        Quaternion.identity, tile.transform);
-
-                    checker.GetComponent<CheckerMovementController>().gameController = gameController;
-
-                    checker.transform.localScale *= 4;
-
-                    SpriteRenderer checkerRenderer = checker.GetComponent<SpriteRenderer>();
-                    CheckerData checkerData = checker.GetComponent<CheckerData>();
-
-                    checkerRenderer.color = new Color(checkerRed.r, checkerRed.g, checkerRed.b);
-                    checkerRenderer.sortingLayerName = "Checkers";
-
-                    checkerData.parentTileID = tileID;
-                    checkerData.color = CheckerColor.RED;
-
-                    checker.name = "Checker Red";
-
+                    CreateChecker(tile, tileID, tileID < 24, checkerRed, checkerBlack);
                 }
-                else if (tileID >= 40 && isDarkSquare)
-                {
-                    GameObject checker = Instantiate(Checker,
-                        new Vector3(tile.transform.position.x, tile.transform.position.y, tile.transform.position.z - 0.1f),
-                        Quaternion.identity, tile.transform);
-
-                    checker.GetComponent<CheckerMovementController>().gameController = gameController;
-
-                    checker.transform.localScale *= 4;
-
-                    SpriteRenderer checkerRenderer = checker.GetComponent<SpriteRenderer>();
-                    CheckerData checkerData = checker.GetComponent<CheckerData>();
-
-                    checkerRenderer.color = new Color(checkerBlack.r, checkerBlack.g, checkerBlack.b);
-                    checkerRenderer.sortingLayerName = "Checkers";
-
-                    checkerData.parentTileID = tileID;
-                    checkerData.color = CheckerColor.BLACK;
-
-                    checker.name = "Checker Black";
-                }
-
 
                 tiles.Add(tileID, tile);
             }
         }
 
         gameController.tiles = tiles;
+    }
+
+    GameObject CreateTile(int i, int j, bool isDarkSquare, int tileID, Color darkColor)
+    {
+        Vector3 scale = transform.localScale / 8;
+        float startX = transform.localScale.x * -0.5f - scale.x / 2;
+        float startY = transform.localScale.y * -0.5f - scale.y / 2;
+
+        float positionX = (startX + ((scale.x) * (j + 1)));
+        float positionY = (startY + ((scale.y) * (i + 1)));
+        float positionZ = -0.1f;
+
+        GameObject tile = Instantiate(Tile, new Vector3(positionX, positionY, positionZ), Quaternion.identity, transform);
+        tile.transform.localScale = scale / 8;
+        SpriteRenderer tileRenderer = tile.GetComponent<SpriteRenderer>();
+        TileController tileController = tile.GetComponent<TileController>();
+
+        tileRenderer.color = isDarkSquare ?
+            new Color(darkColor.r, darkColor.g, darkColor.b) : 
+            new Color(tileColor.r, tileColor.g, tileColor.b);
+
+        tileRenderer.sortingLayerName = "Tiles";
+
+        tileController.id = tileID;
+        tileController.gameController = gameController;
+        tile.name = "Tile " + tileID;
+
+        return tile;
+    }
+
+    void CreateChecker(GameObject tile, int tileID, bool isRed, Color checkerRed, Color checkerBlack)
+    {
+        GameObject checker = Instantiate(Checker,
+                        new Vector3(tile.transform.position.x, tile.transform.position.y, tile.transform.position.z - 0.1f),
+                        Quaternion.identity, tile.transform);
+
+        checker.GetComponent<CheckerMovementController>().gameController = gameController;
+
+        checker.transform.localScale *= 4;
+
+        SpriteRenderer checkerRenderer = checker.GetComponent<SpriteRenderer>();
+        CheckerData checkerData = checker.GetComponent<CheckerData>();
+
+        checkerRenderer.color = isRed ? 
+            new Color(checkerRed.r, checkerRed.g, checkerRed.b) : 
+            new Color(checkerBlack.r, checkerBlack.g, checkerBlack.b);
+
+        checkerRenderer.sortingLayerName = "Checkers";
+
+        checkerData.parentTileID = tileID;
+        checkerData.color = isRed ? CheckerColor.RED : CheckerColor.BLACK;
+
+        checker.name = isRed ? "Checker Red" : "Checker Black";
     }
 }
