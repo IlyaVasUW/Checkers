@@ -68,6 +68,7 @@ public class GameController : MonoBehaviour
             }
             if (tileID_is_valid_move)
             {
+                bool isKillMove = false;
                 checker.SetParent(tiles[tileID].transform, false);
                 checker.transform.position = tiles[tileID].transform.position;
                 checker.GetComponent<CheckerData>().parentTileID = tileID;
@@ -75,8 +76,14 @@ public class GameController : MonoBehaviour
                 {
                     checker.GetComponent<CheckerData>().promoted = true;
                 }
-                clearAndUnhighlightTiles();
+                ClearAndUnhighlightTiles();
                 selectedID = -1;
+
+                if (!isKillMove)
+                {
+                    colorToMove = colorToMove == CheckerColor.RED ? CheckerColor.BLACK : CheckerColor.RED; // CHANGES PLAYER TO MOVE
+                }
+                
             }
         }
         return;
