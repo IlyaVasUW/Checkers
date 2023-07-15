@@ -30,26 +30,28 @@ public class TileController : MonoBehaviour
 
     private void OnMouseUp()
     {
-        Debug.Log("clicked tile");
         gameController.SelectTile(id);
-        if (highlighted)
-        {
-            StopHighlight();
-        } else
-        {
-            Highlight();
-        }
+    }
+
+    public void DisplayOriginalColor()
+    {
+        StopHighlight();
     }
 
     public void Highlight()
     {
         if(color == TileColor.Light)
         {
-            spriteRenderer.color = new Color(highlightColor.r, highlightColor.g, highlightColor.b);
+            spriteRenderer.color = new Color(
+                highlightColor.r, 
+                highlightColor.g, 
+                highlightColor.b);
         } else
         {
             spriteRenderer.color = new Color(
-                highlightColor.r / highlightScale, highlightColor.g / highlightScale, highlightColor.b / highlightScale);
+                highlightColor.r / highlightScale, 
+                highlightColor.g / highlightScale, 
+                highlightColor.b / highlightScale);
         }
 
         highlighted = true;

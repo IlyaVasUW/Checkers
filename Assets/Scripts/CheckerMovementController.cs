@@ -23,7 +23,6 @@ public class CheckerMovementController : MonoBehaviour
     }
     private void OnMouseDown()
     {
-        Debug.Log("clicked checker");
         isMoving = true;
         gameController.SelectChecker(data.parentTileID);
     }
