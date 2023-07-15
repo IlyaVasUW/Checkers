@@ -49,15 +49,31 @@ public class GameController : MonoBehaviour
 
     public void SelectTile(int tileID)
     {
-        if (selectedID != -1)
+        bool tileID_is_valid_move = false;
+        if (selectedID != -1) // prev clicked tile has a checker piece
         {
             Debug.Log(selectedID);
             Transform checker = tiles[selectedID].transform.GetChild(0);
-            checker.SetParent(tiles[tileID].transform, false);
-            checker.transform.position = tiles[tileID].transform.position;
-            checker.GetComponent<CheckerData>().parentTileID = tileID;
-            clearAndUnhighlightTiles();
-            selectedID = -1;
+            int[] validTiles = GenerateValidMoves(selectedID);
+            for (int i = 0; i < validTiles.Length; i++)
+            {
+                if (validTiles[i] == tileID)
+                {
+                    tileID_is_valid_move = true;
+                }
+            }
+            if (tileID_is_valid_move)
+            {
+                checker.SetParent(tiles[tileID].transform, false);
+                checker.transform.position = tiles[tileID].transform.position;
+                checker.GetComponent<CheckerData>().parentTileID = tileID;
+                if (tileID > 55 && tileID < 64 && checker.GetComponent<CheckerData>().promoted == false)
+                {
+                    checker.GetComponent<CheckerData>().promoted = true;
+                }
+                clearAndUnhighlightTiles();
+                selectedID = -1;
+            }
         }
         return;
     }
