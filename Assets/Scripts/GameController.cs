@@ -27,14 +27,10 @@ public class GameController : MonoBehaviour
 
     public void SelectChecker(int tileID)
     {
-        foreach(GameObject tile in highlightedTiles)
-        {
-            tile.GetComponent<TileController>().StopHighlight();
-        }
+        clearAndUnhighlightTiles();
 
         if (selectedID == tileID)
         {
-            highlightedTiles = new GameObject[0];
             selectedID = -1;
             return;
         }
@@ -60,17 +56,117 @@ public class GameController : MonoBehaviour
             checker.SetParent(tiles[tileID].transform, false);
             checker.transform.position = tiles[tileID].transform.position;
             checker.GetComponent<CheckerData>().parentTileID = tileID;
+            clearAndUnhighlightTiles();
             selectedID = -1;
         }
         return;
     }
 
+    void clearAndUnhighlightTiles()
+    {
+        foreach (GameObject tile in highlightedTiles)
+        {
+            tile.GetComponent<TileController>().StopHighlight();
+        }
+        highlightedTiles = new GameObject[0];
+    }
+
     int[] GenerateValidMoves(int tileID)
     {
+        int[] ret = { };
+        Transform checkerTransform = tiles[tileID].transform.GetChild(0);
+        CheckerData checkerData = checkerTransform.GetComponent<CheckerData>();
 
-        // Return all moves as valid for now
-        int[] ret = new int[1];
-        ret[0] = tileID + 8;
+        if(checkerData.promoted)
+        {
+        } else
+        {
+            int available = 0;
+            
+
+            int factor = checkerData.color == CheckerColor.RED ? 1 : -1;
+
+            int id0 = tileID + 7 * factor;
+            if(id0 > 63 || id0 < 0)
+            {
+                return ret;
+            }
+
+            if ((int)(id0 / 8) == (int)(tileID / 8 + 1*factor))
+            {
+                if (tiles[id0].transform.childCount > 0)
+                {
+                    if (tiles[id0].transform.GetChild(0).GetComponent<CheckerData>().color != checkerData.color)
+                    {
+                        id0 += 7 * factor;
+                    }
+                    else
+                    {
+                        id0 = -1;
+                    }
+
+                }
+                if (id0 > -1 && tiles[id0].transform.childCount > 0)
+                {
+                    id0 = -1;
+                }
+
+                if (id0 != -1)
+                {
+                    available++;
+                }
+            } else
+            {
+                id0 = -1;
+            }
+
+            int id1 = tileID + 9 * factor;
+            if (id0 > 63 || id0 < 0)
+            {
+                id1 = -1;
+            }
+
+            if (id1 > 0 && (int)(id1 / 8) == (int)(tileID / 8 + 1*factor))
+            {
+                if (tiles[id1].transform.childCount > 0)
+                {
+                    if (tiles[id1].transform.GetChild(0).GetComponent<CheckerData>().color != checkerData.color)
+                    {
+                        id1 += 9 * factor;
+                    }
+                    else
+                    {
+                        id1 = -1;
+                    }
+                }
+
+                if (id1 > -1 && tiles[id1].transform.childCount > 0)
+                {
+                    id1 = -1;
+                }
+
+                if (id1 != -1)
+                {
+                    available++;
+                }
+            } else
+            {
+                id1 = -1;
+            }
+
+            int relID = 0;
+            ret = new int[available];
+            if(id0 != -1)
+            {
+                ret[relID] = id0;
+                relID++;
+            }
+
+            if(id1 != -1)
+            {
+                ret[relID] = id1;
+            }
+        }
 
         return ret;
     }
