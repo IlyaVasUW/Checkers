@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Experimental.GlobalIllumination;
 
 public class GameController : MonoBehaviour
 {
@@ -15,7 +16,7 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        colorToMove = CheckerColor.RED;
+        colorToMove = CheckerColor.BLACK;
         selectedID = -1;
         highlightedTiles = new int[0];
     }
@@ -125,18 +126,91 @@ public class GameController : MonoBehaviour
 
     int[] GenerateValidMoves(int tileID)
     {
-        int[] ret = { };
+        int[] ret;
         Transform checkerTransform = tiles[tileID].transform.GetChild(0);
         CheckerData checkerData = checkerTransform.GetComponent<CheckerData>();
 
+        int size = 0;
+        int factor = checkerData.color == CheckerColor.RED ? -1 : 1;
+
         if (checkerData.promoted)
         {
+            /*
+            int[] topLeftMoves = GenerateOffsetPromotedMoves(7, factor, checkerData, tileID);
+            int[] topRightMoves = GenerateOffsetPromotedMoves(9, factor, checkerData, tileID);
+            int[] bottomLeftMoves = GenerateOffsetPromotedMoves(-7, factor, checkerData, tileID);
+            int[] bottomRightMoves = GenerateOffsetPromotedMoves(-9, factor, checkerData, tileID);
+
+            size = topLeftMoves.Length + topRightMoves.Length + bottomLeftMoves.Length + bottomRightMoves.Length;
+            ret = new int[size];
+            int moveIndex = 0;
+
+            for (int i = 0; i < topLeftMoves.Length; i++)
+            {
+                ret[moveIndex++] = topLeftMoves[i];
+            }
+            for (int i = 0; i < topRightMoves.Length; i++)
+            {
+                ret[moveIndex++] = topRightMoves[i];
+            }
+            for (int i = 0; i < bottomLeftMoves.Length; i++)
+            {
+                ret[moveIndex++] = bottomLeftMoves[i];
+            }
+            for (int i = 0; i < bottomRightMoves.Length; i++)
+            {
+                ret[moveIndex++] = bottomRightMoves[i];
+            }
+            */
+
+            int topLeftMove = GenerateOffsetUnpromotedMove(7, factor, checkerData, tileID);
+            int topRightMove = GenerateOffsetUnpromotedMove(9, factor, checkerData, tileID);
+            int bottomLeftMove = GenerateOffsetUnpromotedMove(-7, factor, checkerData, tileID);
+            int bottomRightMove = GenerateOffsetUnpromotedMove(-9, factor, checkerData, tileID);
+
+            if (topLeftMove > -1)
+            {
+                size++;
+            }
+            if (topRightMove > -1)
+            {
+                size++;
+            }
+            if (bottomLeftMove > -1)
+            {
+                size++;
+            }
+            if (bottomRightMove > -1)
+            {
+                size++;
+            }
+
+            ret = new int[size];
+
+            int moveIndex = 0;
+            if (topLeftMove > -1)
+            {
+                ret[moveIndex] = topLeftMove;
+                moveIndex++;
+            }
+            if (topRightMove > -1)
+            {
+                ret[moveIndex] = topRightMove;
+            }
+            if (bottomLeftMove > -1)
+            {
+                ret[moveIndex] = bottomLeftMove;
+                moveIndex++;
+            }
+            if (bottomRightMove > -1)
+            {
+                ret[moveIndex] = bottomRightMove;
+            }
+
+            return ret;
         }
         else
         {
-            int size = 0;
-            int factor = checkerData.color == CheckerColor.RED ? 1 : -1;
-
             int leftMove = GenerateOffsetUnpromotedMove(7, factor, checkerData, tileID);
             int rightMove = GenerateOffsetUnpromotedMove(9, factor, checkerData, tileID);
 
@@ -165,6 +239,12 @@ public class GameController : MonoBehaviour
         return ret;
     }
 
+    int[] GenerateOffsetPromotedMoves(int offset, int factor, CheckerData checkerData, int tileID)
+    {
+        int[] ret = { };
+        return ret;
+    }
+
     int GenerateOffsetUnpromotedMove(int offset, int factor, CheckerData checkerData, int tileID)
     {
         int id = tileID + offset * factor;
@@ -177,9 +257,14 @@ public class GameController : MonoBehaviour
         {
             if (tiles[id].transform.childCount > 0)
             {
-                if (tiles[id].transform.GetChild(0).GetComponent<CheckerData>().color != checkerData.color)
+                CheckerData childData = tiles[id].transform.GetChild(0).GetComponent<CheckerData>();
+                if (childData.color != checkerData.color && childData.dead != true)
                 {
                     id += offset * factor;
+                    if((int)(id / 8) != (int)(tileID / 8 + 2 * factor))
+                    {
+                        id = -1;
+                    }
                 }
                 else
                 {

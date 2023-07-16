@@ -8,6 +8,9 @@ public class CheckerData : MonoBehaviour
     public int parentTileID;
     public CheckerColor color;
     public bool promoted;
+    public bool dead;
+    public static Color redColor;
+    public static Color blackColor;
     // Start is called before the first frame update
     void Start()
     {

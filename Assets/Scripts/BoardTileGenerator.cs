@@ -21,6 +21,9 @@ public class BoardTileGenerator : MonoBehaviour
         Color checkerRed = new Color(180, 0, 0);
         Color checkerBlack = new Color(0, 0, 0);
 
+        CheckerData.redColor = new Color(checkerRed.r, checkerRed.g, checkerRed.b);
+        CheckerData.blackColor = new Color(checkerBlack.r, checkerBlack.g, checkerBlack.b);
+
         for(int i = 0; i < 8; i++)
         {
             for(int j = 0; j < 8; j++)
@@ -33,7 +36,7 @@ public class BoardTileGenerator : MonoBehaviour
 
                 if ((tileID < 24 || tileID >= 40) && isDarkSquare)
                 {
-                    CreateChecker(tile, tileID, tileID < 24, checkerRed, checkerBlack);
+                    CreateChecker(tile, tileID, tileID >= 40, checkerRed, checkerBlack);
                 }
 
                 gameController.tiles.Add(tileID, tile);
