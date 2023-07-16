@@ -21,7 +21,7 @@ public class CheckerDisplay : MonoBehaviour
         
     }
 
-    public void refreshDisplay()
+    public void RefreshDisplay()
     {
         int alpha = data.dead ? 0 : 255;
         if (data.color == CheckerColor.RED)
@@ -45,7 +45,7 @@ public class CheckerDisplay : MonoBehaviour
 
     }
 
-    public void updatePromoteSprite()
+    public void UpdatePromoteSprite()
     {
         spriteRenderer.sprite = promoteSprite;
     }

@@ -56,8 +56,6 @@ public class GameController : MonoBehaviour
         bool tileID_is_valid_move = false;
         if (selectedID != -1) // prev clicked tile has a checker piece
         {
-            //if
-            Debug.Log(selectedID);
             Transform checker = tiles[selectedID].transform.GetChild(0);
             int[] validTiles = GenerateValidMoves(selectedID);
             for (int i = 0; i < validTiles.Length; i++)
@@ -67,15 +65,17 @@ public class GameController : MonoBehaviour
                     tileID_is_valid_move = true;
                 }
             }
-            if (tileID_is_valid_move)
+            if (tileID_is_valid_move) //move is valid
             {
-                bool isKillMove = false;
+                Transform capturedChecker = null;
+                bool isKillMove = isMoveCapture(selectedID, tileID, capturedChecker);
                 checker.SetParent(tiles[tileID].transform, false);
                 checker.transform.position = tiles[tileID].transform.position;
                 checker.GetComponent<CheckerData>().parentTileID = tileID;
                 if (tileID > 55 && tileID < 64 && checker.GetComponent<CheckerData>().promoted == false)
                 {
                     checker.GetComponent<CheckerData>().promoted = true;
+                    checker.GetComponent<CheckerDisplay>().UpdatePromoteSprite();
                 }
                 ClearAndUnhighlightTiles();
                 selectedID = -1;
@@ -84,7 +84,10 @@ public class GameController : MonoBehaviour
                 {
                     colorToMove = colorToMove == CheckerColor.RED ? CheckerColor.BLACK : CheckerColor.RED; // CHANGES PLAYER TO MOVE
                 }
-                
+                else
+                {
+                    SelectChecker(tileID);
+                }
             }
         }
         return;
@@ -283,5 +286,106 @@ public class GameController : MonoBehaviour
         }
 
         return id;
+    }
+
+    //use for any diagnol capture (forward, backward, long, or short)
+    //assumes the move input is a valid move
+    //assumes only one checker can be captured at a time
+    //also returns captured checker transform if there is a capture
+    bool isMoveCapture(int startTileID, int endTileID, Transform capturedChecker)
+    {
+        CheckerColor movingCheckerColor;
+        //checking color of moving checker
+        if (tiles[startTileID].transform.childCount != 0)
+        {
+            movingCheckerColor = tiles[startTileID].transform.GetChild(0).GetComponent<CheckerData>().color;
+        }
+        else
+        {
+            return false; //there is no checker on the starting tile
+        }
+
+        int factor = 1;
+        if (startTileID > endTileID) //move goes down the board
+        {
+            factor = -1;
+        }
+
+        bool captured = false;
+        int curID = startTileID;
+        if (startTileID % 8 > endTileID % 8) //move goes left
+        {
+            int movementfactor = 0;
+            if (factor == 1)
+            {
+                movementfactor = 7;
+            }
+            else
+            {
+                movementfactor = -9;
+            }
+            curID += movementfactor;
+            while (curID % 8 > endTileID % 8) //going down the diagnol
+            {
+                if (tiles[curID].transform.childCount > 0) //something is being captured
+                {
+                    Transform checkerTransform = tiles[curID].transform.GetChild(0);
+                    if (checkerTransform.GetComponent<CheckerData>().color != movingCheckerColor) //checker is opposite of starting color
+                    {
+                        if (captured == true) //attempting to capture a second piece, invalid move
+                        {
+                            capturedChecker = null;
+                            return false;
+                        }
+                        capturedChecker = checkerTransform; //return pointer to checker that will be captured
+                        captured = true;
+                    }
+                    else //checker is same as starting color, invalid move
+                    {
+                        capturedChecker = null;
+                        return false;
+                    }
+                }
+                curID += movementfactor;
+            }
+        }
+        else //move goes right
+        {
+            int movementfactor = 0;
+            if (factor == 1)
+            {
+                movementfactor = 9;
+            }
+            else
+            {
+                movementfactor = -7;
+            }
+            curID += movementfactor;
+            while (curID % 8 < endTileID % 8) //going down the diagnol
+            {
+                if (tiles[curID].transform.childCount > 0) //something is being captured
+                {
+                    Transform checkerTransform = tiles[curID].transform.GetChild(0);
+                    if (checkerTransform.GetComponent<CheckerData>().color != movingCheckerColor) //checker is opposite of starting color
+                    {
+                        if (captured == true) //attempting to capture a second piece, invalid move
+                        {
+                            capturedChecker = null;
+                            return false;
+                        }
+                        capturedChecker = checkerTransform; //return pointer to checker that will be captured
+                        captured = true;
+                    }
+                    else //checker is same as starting color, invalid move
+                    {
+                        capturedChecker = null;
+                        return false;
+                    }
+                }
+                curID += movementfactor;
+            }
+        }
+
+        return captured;
     }
 }
