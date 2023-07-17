@@ -63,6 +63,7 @@ public class GameController : MonoBehaviour
                 if (validTiles[i] == tileID)
                 {
                     tileID_is_valid_move = true;
+                    break;
                 }
             }
             if (tileID_is_valid_move) //move is valid
@@ -86,11 +87,28 @@ public class GameController : MonoBehaviour
                 }
                 else
                 {
+                    if(capturedChecker != null)
+                    {
+                        capturedChecker.SetParent(transform.Find("Dead Checkers"), false);
+                        capturedChecker.GetComponent<CheckerData>().dead = true;
+                    }
                     SelectChecker(tileID);
                 }
             }
         }
+        RefreshCheckersDisplay();
         return;
+    }
+
+    void RefreshCheckersDisplay()
+    {
+        for (int i = 0; i < 63; i++)
+        {
+            if (tiles[i].transform.childCount > 0)
+            {
+                tiles[i].transform.GetChild(0).GetComponent<CheckerDisplay>().RefreshDisplay();
+            }
+        }
     }
 
     void ClearAndUnhighlightTiles()

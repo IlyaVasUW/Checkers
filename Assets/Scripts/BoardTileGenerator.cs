@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class BoardTileGenerator : MonoBehaviour
 {
@@ -23,16 +24,18 @@ public class BoardTileGenerator : MonoBehaviour
 
         CheckerData.redColor = new Color(checkerRed.r, checkerRed.g, checkerRed.b);
         CheckerData.blackColor = new Color(checkerBlack.r, checkerBlack.g, checkerBlack.b);
+        
+        GameObject deadCheckersTile = CreateTile(8, 8, false, -1, darkColor, false);
+        deadCheckersTile.name = "Dead Checkers";
 
-        for(int i = 0; i < 8; i++)
+        for (int i = 0; i < 8; i++)
         {
             for(int j = 0; j < 8; j++)
             {
                 int tileID = i * 8 + j;
-
                 bool isDarkSquare = (i + j) % 2 == 0;
 
-                GameObject tile = CreateTile(i, j, isDarkSquare, tileID, darkColor);
+                GameObject tile = CreateTile(i, j, isDarkSquare, tileID, darkColor, true);
 
                 if ((tileID < 24 || tileID >= 40) && isDarkSquare)
                 {
@@ -44,7 +47,7 @@ public class BoardTileGenerator : MonoBehaviour
         }
     }
 
-    GameObject CreateTile(int i, int j, bool isDarkSquare, int tileID, Color darkColor)
+    GameObject CreateTile(int i, int j, bool isDarkSquare, int tileID, Color darkColor, bool visible)
     {
         Vector3 scale = transform.localScale / 8;
         float startX = transform.localScale.x * -0.5f - scale.x / 2;
@@ -60,8 +63,8 @@ public class BoardTileGenerator : MonoBehaviour
         TileController tileController = tile.GetComponent<TileController>();
 
         tileRenderer.color = isDarkSquare ?
-            new Color(darkColor.r, darkColor.g, darkColor.b) : 
-            new Color(tileColor.r, tileColor.g, tileColor.b);
+            new Color(darkColor.r, darkColor.g, darkColor.b, visible ? 255 : 0) : 
+            new Color(tileColor.r, tileColor.g, tileColor.b, visible ? 255 : 0);
 
         tileRenderer.sortingLayerName = "Tiles";
 
