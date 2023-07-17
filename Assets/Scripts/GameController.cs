@@ -13,12 +13,14 @@ public class GameController : MonoBehaviour
 
     int[] highlightedTiles;
     int selectedID;
+    Transform deadCheckers;
     // Start is called before the first frame update
     void Start()
     {
         colorToMove = CheckerColor.BLACK;
         selectedID = -1;
         highlightedTiles = new int[0];
+        deadCheckers = transform.Find("Dead Checkers");
     }
 
     // Update is called once per frame
@@ -89,7 +91,7 @@ public class GameController : MonoBehaviour
                 {
                     if(capturedChecker != null)
                     {
-                        capturedChecker.SetParent(transform.Find("Dead Checkers"), false);
+                        capturedChecker.SetParent(deadCheckers, false);
                         capturedChecker.GetComponent<CheckerData>().dead = true;
                     }
                     SelectChecker(tileID);
@@ -108,6 +110,11 @@ public class GameController : MonoBehaviour
             {
                 tiles[i].transform.GetChild(0).GetComponent<CheckerDisplay>().RefreshDisplay();
             }
+        }
+        
+        for (int i = 0; i < deadCheckers.childCount; i++)
+        {
+            deadCheckers.GetChild(i).GetComponent<CheckerDisplay>().RefreshDisplay();
         }
     }
 
