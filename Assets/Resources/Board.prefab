@@ -103,6 +103,7 @@ MonoBehaviour:
   Tile: {fileID: 6415282848869800359, guid: 6a0acf096d30a8a449df86005a047e78, type: 3}
   Checker: {fileID: 70438903412605158, guid: 77ff4825bb5eb1048aa21c768312434e, type: 3}
   tileColor: {r: 0.9528302, g: 0.8039784, b: 0.644209, a: 1}
+  highlightColor: {r: 1, g: 1, b: 0.39215687, a: 1}
   colorScale: 4
 --- !u!114 &3802380482025741140
 MonoBehaviour:
@@ -116,6 +117,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f3b0c5c813ba264784bd30a2ad7cb35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  colorToMove: 0
 --- !u!1001 &3002307280588144243
 PrefabInstance:
   m_ObjectHideFlags: 0
