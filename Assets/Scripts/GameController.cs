@@ -261,8 +261,8 @@ public class GameController : MonoBehaviour
         {
             int leftMove = GenerateOffsetUnpromotedMove(7, factor, checkerData, tileID);
             int rightMove = GenerateOffsetUnpromotedMove(9, factor, checkerData, tileID);
-            int bottomLeftCapture = GenerateOffsetCapture(-7, factor, checkerData, tileID);
-            int bottomRightCapture = GenerateOffsetCapture(-9, factor, checkerData, tileID);
+            int bottomLeftCapture = GenerateOffsetCapture(7, factor * -1, checkerData, tileID);
+            int bottomRightCapture = GenerateOffsetCapture(9, factor * -1, checkerData, tileID);
 
             if (leftMove > -1)
             {
@@ -379,7 +379,7 @@ public class GameController : MonoBehaviour
             return -1;
         }
 
-        if ((int)(id / 8) != (int)(tileID / 8 + 1 * factor))
+        if ((int)(id / 8) != (int)(tileID / 8 + 2 * factor))
         {
             return -1;
         }
