@@ -72,7 +72,12 @@ public class GameController : MonoBehaviour
                 checker.SetParent(tiles[tileID].transform, false);
                 checker.transform.position = tiles[tileID].transform.position;
                 checker.GetComponent<CheckerData>().parentTileID = tileID;
-                if (tileID > 55 && tileID < 64 && checker.GetComponent<CheckerData>().promoted == false)
+                if (colorToMove == CheckerColor.BLACK && tileID > 55 && tileID < 64 && checker.GetComponent<CheckerData>().promoted == false)
+                {
+                    checker.GetComponent<CheckerData>().promoted = true;
+                    checker.GetComponent<CheckerDisplay>().UpdatePromoteSprite();
+                }
+                if (colorToMove == CheckerColor.RED && tileID > -1 && tileID < 8 && checker.GetComponent<CheckerData>().promoted == false)
                 {
                     checker.GetComponent<CheckerData>().promoted = true;
                     checker.GetComponent<CheckerDisplay>().UpdatePromoteSprite();
@@ -86,7 +91,7 @@ public class GameController : MonoBehaviour
                 }
                 else
                 {
-                    SelectChecker(tileID);
+                    colorToMove = colorToMove == CheckerColor.RED ? CheckerColor.BLACK : CheckerColor.RED; // CHANGES PLAYER TO MOVE
                 }
             }
         }
