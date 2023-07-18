@@ -6,7 +6,10 @@ using UnityEngine;
 public class CheckerDisplay : MonoBehaviour
 {
     // Start is called before the first frame update
-    [SerializeField] Sprite promoteSprite;
+    [SerializeField] Sprite promotePipeSprite;
+    [SerializeField] Sprite promotePokeSprite;
+    int pipeScale = 30;
+    int pokeScale = 20;
     CheckerData data;
     SpriteRenderer spriteRenderer;
     void Start()
@@ -23,31 +26,34 @@ public class CheckerDisplay : MonoBehaviour
 
     public void RefreshDisplay()
     {
-        int alpha = data.dead ? 0 : 255;
-        if (data.color == CheckerColor.RED)
+        float red = data.color == CheckerColor.RED ? CheckerData.redColor.r : CheckerData.blackColor.r;
+        float green = 0;
+        float blue = 0;
+
+        if(data.promoted)
         {
-            spriteRenderer.color = new Color(
-                CheckerData.redColor.r,
-                CheckerData.redColor.g,
-                CheckerData.redColor.b,
-                alpha
-                );
-        }
-        if (data.color == CheckerColor.BLACK)
-        {
-            spriteRenderer.color = new Color(
-                CheckerData.blackColor.r,
-                CheckerData.blackColor.g,
-                CheckerData.blackColor.b,
-                alpha
-                );
+            red = 255;
+            green = 255;
+            blue = 255;
         }
 
+        int alpha = data.dead ? 0 : 255;
+        spriteRenderer.color = new Color(
+                red,
+                green,
+                blue,
+                alpha
+                );
     }
 
     public void UpdatePromoteSprite()
     {
-        spriteRenderer.sprite = promoteSprite;
-        transform.localScale /= 4;
+        spriteRenderer.sprite = data.color == CheckerColor.BLACK ? promotePipeSprite : promotePokeSprite;
+        transform.localScale /= data.color == CheckerColor.BLACK ? pipeScale : pokeScale;
+        spriteRenderer.color = new Color(
+                255,
+                255,
+                255, 
+                255);
     }
 }
