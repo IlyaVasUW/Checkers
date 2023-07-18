@@ -48,5 +48,6 @@ public class CheckerDisplay : MonoBehaviour
     public void UpdatePromoteSprite()
     {
         spriteRenderer.sprite = promoteSprite;
+        transform.localScale /= 4;
     }
 }

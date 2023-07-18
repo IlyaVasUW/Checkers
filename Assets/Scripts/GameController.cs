@@ -14,6 +14,7 @@ public class GameController : MonoBehaviour
     int[] highlightedTiles;
     int selectedID;
     Transform deadCheckers;
+    bool isCaptureInEffect;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,6 +22,7 @@ public class GameController : MonoBehaviour
         selectedID = -1;
         highlightedTiles = new int[0];
         deadCheckers = transform.Find("Dead Checkers");
+        isCaptureInEffect = false;
     }
 
     // Update is called once per frame
@@ -31,6 +33,10 @@ public class GameController : MonoBehaviour
 
     public void SelectChecker(int tileID)
     {
+        if (isCaptureInEffect) //prevent clicking off cpaturing checker
+        {
+            return;
+        }
         if (tiles[tileID].transform.GetChild(0).GetComponent<CheckerData>().color != colorToMove)
         {
             return;
@@ -70,8 +76,7 @@ public class GameController : MonoBehaviour
             }
             if (tileID_is_valid_move) //move is valid
             {
-                Transform capturedChecker = null;
-                bool isKillMove = isMoveCapture(selectedID, tileID, capturedChecker);
+                Transform capturedChecker = isMoveCapture(selectedID, tileID);
                 checker.SetParent(tiles[tileID].transform, false);
                 checker.transform.position = tiles[tileID].transform.position;
                 checker.GetComponent<CheckerData>().parentTileID = tileID;
@@ -87,19 +92,29 @@ public class GameController : MonoBehaviour
                 }
                 ClearAndUnhighlightTiles();
                 selectedID = -1;
-
-                if (!isKillMove)
+                if (capturedChecker == null)
                 {
                     colorToMove = colorToMove == CheckerColor.RED ? CheckerColor.BLACK : CheckerColor.RED; // CHANGES PLAYER TO MOVE
+                    isCaptureInEffect = false;
                 }
                 else
                 {
-                    if(capturedChecker != null)
-                    {
-                        capturedChecker.SetParent(deadCheckers, false);
-                        capturedChecker.GetComponent<CheckerData>().dead = true;
-                    }
+                    capturedChecker.SetParent(deadCheckers, false);
+                    capturedChecker.GetComponent<CheckerData>().SetDead(true);
+                    isCaptureInEffect = false;
                     SelectChecker(tileID);
+                    if (highlightedTiles.Length == 0)
+                    {
+                        UnhighlightSelectedTile();
+                        ClearAndUnhighlightTiles();
+                        selectedID = -1;
+                        colorToMove = colorToMove == CheckerColor.RED ? CheckerColor.BLACK : CheckerColor.RED; // CHANGES PLAYER TO MOVE
+                        isCaptureInEffect = false;
+                    }
+                    else 
+                    { 
+                        isCaptureInEffect = true;
+                    }
                 }
             }
         }
@@ -242,7 +257,7 @@ public class GameController : MonoBehaviour
 
             return ret;
         }
-        else
+        else //non promoted checker movement rules
         {
             int leftMove = GenerateOffsetUnpromotedMove(7, factor, checkerData, tileID);
             int rightMove = GenerateOffsetUnpromotedMove(9, factor, checkerData, tileID);
@@ -294,6 +309,10 @@ public class GameController : MonoBehaviour
                 if (childData.color != checkerData.color && childData.dead != true)
                 {
                     id += offset * factor;
+                    if(id > 63 || id < 0)
+                    {
+                        id = -1;
+                    }
                     if((int)(id / 8) != (int)(tileID / 8 + 2 * factor))
                     {
                         id = -1;
@@ -322,7 +341,7 @@ public class GameController : MonoBehaviour
     //assumes the move input is a valid move
     //assumes only one checker can be captured at a time
     //also returns captured checker transform if there is a capture
-    bool isMoveCapture(int startTileID, int endTileID, Transform capturedChecker)
+    Transform isMoveCapture(int startTileID, int endTileID)
     {
         CheckerColor movingCheckerColor;
         //checking color of moving checker
@@ -332,7 +351,7 @@ public class GameController : MonoBehaviour
         }
         else
         {
-            return false; //there is no checker on the starting tile
+            return null; //there is no checker on the starting tile
         }
 
         int factor = 1;
@@ -342,6 +361,7 @@ public class GameController : MonoBehaviour
         }
 
         bool captured = false;
+        Transform capturedChecker = null;
         int curID = startTileID;
         if (startTileID % 8 > endTileID % 8) //move goes left
         {
@@ -364,16 +384,14 @@ public class GameController : MonoBehaviour
                     {
                         if (captured == true) //attempting to capture a second piece, invalid move
                         {
-                            capturedChecker = null;
-                            return false;
+                            return null;
                         }
                         capturedChecker = checkerTransform; //return pointer to checker that will be captured
                         captured = true;
                     }
                     else //checker is same as starting color, invalid move
                     {
-                        capturedChecker = null;
-                        return false;
+                        return null;
                     }
                 }
                 curID += movementfactor;
@@ -400,22 +418,20 @@ public class GameController : MonoBehaviour
                     {
                         if (captured == true) //attempting to capture a second piece, invalid move
                         {
-                            capturedChecker = null;
-                            return false;
+                            return null;
                         }
                         capturedChecker = checkerTransform; //return pointer to checker that will be captured
                         captured = true;
                     }
                     else //checker is same as starting color, invalid move
                     {
-                        capturedChecker = null;
-                        return false;
+                        return null;
                     }
                 }
                 curID += movementfactor;
             }
         }
 
-        return captured;
+        return capturedChecker;
     }
 }
