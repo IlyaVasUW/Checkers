@@ -12,13 +12,11 @@ public class TileController : MonoBehaviour
     public int colorScale;
 
     SpriteRenderer spriteRenderer;
-    bool highlighted;
     int highlightScale;
     // Start is called before the first frame update
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        highlighted = false;
         highlightScale = colorScale / 2;
     }
 
@@ -53,8 +51,6 @@ public class TileController : MonoBehaviour
                 highlightColor.g / highlightScale, 
                 highlightColor.b / highlightScale);
         }
-
-        highlighted = true;
     }
 
     public void StopHighlight()
@@ -66,8 +62,6 @@ public class TileController : MonoBehaviour
         {
             spriteRenderer.color = new Color(baseColor.r / colorScale, baseColor.g / colorScale, baseColor.b / colorScale);
         }
-
-        highlighted = false;
     }
 }
 

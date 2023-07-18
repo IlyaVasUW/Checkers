@@ -76,7 +76,7 @@ public class GameController : MonoBehaviour
             }
             if (tileID_is_valid_move) //move is valid
             {
-                Transform capturedChecker = isMoveCapture(selectedID, tileID);
+                Transform capturedChecker = IsMoveCapture(selectedID, tileID);
                 checker.SetParent(tiles[tileID].transform, false);
                 checker.transform.position = tiles[tileID].transform.position;
                 checker.GetComponent<CheckerData>().parentTileID = tileID;
@@ -214,6 +214,8 @@ public class GameController : MonoBehaviour
         {
             int leftMove = GenerateOffsetUnpromotedMove(7, factor, checkerData, tileID);
             int rightMove = GenerateOffsetUnpromotedMove(9, factor, checkerData, tileID);
+            int bottomLeftCapture = GenerateOffsetCapture(7, factor * -1, checkerData, tileID);
+            int bottomRightCapture = GenerateOffsetCapture(9, factor * -1, checkerData, tileID);
 
             if (leftMove > -1)
             {
@@ -223,24 +225,39 @@ public class GameController : MonoBehaviour
             {
                 size++;
             }
-            
+            if (bottomLeftCapture > -1)
+            {
+                size++;
+            }
+            if (bottomRightCapture> -1)
+            {
+                size++;
+            }
+
             ret = new int[size];
 
             int moveIndex = 0;
             if (leftMove > -1)
             {
-                ret[moveIndex] = leftMove;
-                moveIndex++;
+                ret[moveIndex++] = leftMove;
             }
             if (rightMove > -1)
             {
-                ret[moveIndex] = rightMove;
+                ret[moveIndex++] = rightMove;
+            }
+            if (bottomLeftCapture > -1)
+            {
+                ret[moveIndex++] = bottomLeftCapture;
+            }
+            if (bottomRightCapture > -1)
+            {
+                ret[moveIndex++] = bottomRightCapture;
             }
         }
         return ret;
     }
 
-    int[] GenerateOffsetPromotedMoves(int offset, int factor, CheckerData checkerData, int tileID)
+    int[] GenerateOffsetPromotedMoves(int offset, CheckerData checkerData, int tileID)
     {
         int[] ret = { };
         int index = 0;
@@ -319,11 +336,49 @@ public class GameController : MonoBehaviour
         return id;
     }
 
+    int GenerateOffsetCapture(int offset, int factor, CheckerData checkerData, int tileID)
+    {
+        int id = tileID + offset * factor;
+        if (id > 63 || id < 0)
+        {
+            return -1;
+        }
+
+        if ((int)(id / 8) != (int)(tileID / 8 + 1 * factor))
+        {
+            return -1;
+        }
+
+        if (tiles[id].transform.childCount == 0 || tiles[id].transform.GetChild(0).GetComponent<CheckerData>().color == checkerData.color)
+        {
+            return -1;
+        }
+
+        id += offset * factor;
+
+        if (id > 63 || id < 0)
+        {
+            return -1;
+        }
+
+        if ((int)(id / 8) != (int)(tileID / 8 + 2 * factor))
+        {
+            return -1;
+        }
+
+        if (tiles[id].transform.childCount != 0)
+        {
+            return -1;
+        }
+
+        return id;
+    }
+
     //use for any diagnol capture (forward, backward, long, or short)
     //assumes the move input is a valid move
     //assumes only one checker can be captured at a time
     //also returns captured checker transform if there is a capture
-    Transform isMoveCapture(int startTileID, int endTileID)
+    Transform IsMoveCapture(int startTileID, int endTileID)
     {
         CheckerColor movingCheckerColor;
         //checking color of moving checker
