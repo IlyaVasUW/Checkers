@@ -183,11 +183,10 @@ public class GameController : MonoBehaviour
 
         if (checkerData.promoted)
         {
-            /*
             int[] topLeftMoves = GenerateOffsetPromotedMoves(7, factor, checkerData, tileID);
             int[] topRightMoves = GenerateOffsetPromotedMoves(9, factor, checkerData, tileID);
-            int[] bottomLeftMoves = GenerateOffsetPromotedMoves(-7, factor, checkerData, tileID);
-            int[] bottomRightMoves = GenerateOffsetPromotedMoves(-9, factor, checkerData, tileID);
+            int[] bottomLeftMoves = GenerateOffsetPromotedMoves(7, -1*factor, checkerData, tileID);
+            int[] bottomRightMoves = GenerateOffsetPromotedMoves(9, -1*factor, checkerData, tileID);
 
             size = topLeftMoves.Length + topRightMoves.Length + bottomLeftMoves.Length + bottomRightMoves.Length;
             ret = new int[size];
@@ -209,52 +208,6 @@ public class GameController : MonoBehaviour
             {
                 ret[moveIndex++] = bottomRightMoves[i];
             }
-            */
-
-            int topLeftMove = GenerateOffsetUnpromotedMove(7, factor, checkerData, tileID);
-            int topRightMove = GenerateOffsetUnpromotedMove(9, factor, checkerData, tileID);
-            int bottomLeftMove = GenerateOffsetUnpromotedMove(-7, factor, checkerData, tileID);
-            int bottomRightMove = GenerateOffsetUnpromotedMove(-9, factor, checkerData, tileID);
-
-            if (topLeftMove > -1)
-            {
-                size++;
-            }
-            if (topRightMove > -1)
-            {
-                size++;
-            }
-            if (bottomLeftMove > -1)
-            {
-                size++;
-            }
-            if (bottomRightMove > -1)
-            {
-                size++;
-            }
-
-            ret = new int[size];
-
-            int moveIndex = 0;
-            if (topLeftMove > -1)
-            {
-                ret[moveIndex] = topLeftMove;
-                moveIndex++;
-            }
-            if (topRightMove > -1)
-            {
-                ret[moveIndex] = topRightMove;
-            }
-            if (bottomLeftMove > -1)
-            {
-                ret[moveIndex] = bottomLeftMove;
-                moveIndex++;
-            }
-            if (bottomRightMove > -1)
-            {
-                ret[moveIndex] = bottomRightMove;
-            }
-
             return ret;
         }
         else //non promoted checker movement rules
@@ -290,6 +243,35 @@ public class GameController : MonoBehaviour
     int[] GenerateOffsetPromotedMoves(int offset, int factor, CheckerData checkerData, int tileID)
     {
         int[] ret = { };
+        int index = 0;
+        int prevMove = tileID;
+        bool foundEnd = false;
+        int foundID = -1;
+        while (!foundEnd) //continue down diagnol until out of bounds or found a checker piece
+        {
+            foundID = GenerateOffsetUnpromotedMove(offset, factor, checkerData, prevMove);
+            if (foundID != -1) //found a piece may continue while loop
+            {
+                if ((int)(foundID / 8) == (int)(prevMove / 8 + 2 * factor))
+                {
+                    foundEnd = true;
+                }
+                //ret[index] = foundID;
+                prevMove = foundID;
+                index++;
+            }
+            else
+            {
+                foundEnd = true;
+            }
+        }
+        ret = new int[index];
+        prevMove = tileID;
+        for (int i = 0; i < index; i++)
+        {
+            ret[i] = GenerateOffsetUnpromotedMove(offset, factor, checkerData, prevMove);
+            prevMove = foundID;
+        }
         return ret;
     }
 
@@ -377,7 +359,7 @@ public class GameController : MonoBehaviour
             curID += movementfactor;
             while (curID % 8 > endTileID % 8) //going down the diagnol
             {
-                if (tiles[curID].transform.childCount > 0) //something is being captured
+                if (tiles[curID].transform.childCount > 0) //something is being blocking diagonal
                 {
                     Transform checkerTransform = tiles[curID].transform.GetChild(0);
                     if (checkerTransform.GetComponent<CheckerData>().color != movingCheckerColor) //checker is opposite of starting color
