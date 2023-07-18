@@ -257,10 +257,10 @@ public class GameController : MonoBehaviour
         return ret;
     }
 
-    int[] GenerateOffsetPromotedMoves(int offset, CheckerData checkerData, int tileID)
+    int[] GenerateOffsetPromotedMoves(int offset, int factor, CheckerData checkerData, int tileID)
     {
         int[] ret = { };
-        int index = 0;
+        int retLength = 0;
         int prevMove = tileID;
         bool foundEnd = false;
         int foundID = -1;
@@ -273,21 +273,21 @@ public class GameController : MonoBehaviour
                 {
                     foundEnd = true;
                 }
-                //ret[index] = foundID;
+                //ret[retLength] = foundID;
                 prevMove = foundID;
-                index++;
+                retLength++;
             }
             else
             {
                 foundEnd = true;
             }
         }
-        ret = new int[index];
+        ret = new int[retLength];
         prevMove = tileID;
-        for (int i = 0; i < index; i++)
+        for (int i = 0; i < retLength; i++)
         {
             ret[i] = GenerateOffsetUnpromotedMove(offset, factor, checkerData, prevMove);
-            prevMove = foundID;
+            prevMove = ret[i];
         }
         return ret;
     }

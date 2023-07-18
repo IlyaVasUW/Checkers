@@ -48,6 +48,7 @@ public class CheckerDisplay : MonoBehaviour
 
     public void UpdatePromoteSprite()
     {
+        GetComponent<CircleCollider2D>().radius = 0.1f * (CheckerColor.BLACK == data.color ? pipeScale : pokeScale);
         spriteRenderer.sprite = data.color == CheckerColor.BLACK ? promotePipeSprite : promotePokeSprite;
         transform.localScale /= data.color == CheckerColor.BLACK ? pipeScale : pokeScale;
         spriteRenderer.color = new Color(
