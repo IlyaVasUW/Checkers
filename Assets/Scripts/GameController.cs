@@ -24,7 +24,7 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        useAI = false;
+        useAI = true;
         aiColor = CheckerColor.RED;
         colorToMove = CheckerColor.BLACK;
         selectedID = -1;
@@ -38,6 +38,7 @@ public class GameController : MonoBehaviour
     {
         if (useAI && colorToMove == aiColor)
         {
+            Debug.Log("AI is thinking...");
             CheckerTile[] currentTiles = new CheckerTile[64];
 
             for (int i = 0; i < 64; i++)
@@ -60,7 +61,12 @@ public class GameController : MonoBehaviour
 
             CheckerBoard currentBoard = new CheckerBoard(currentTiles, colorToMove);
 
-            MinimaxFunction.Minimax(currentBoard, false, 9);
+            var output = MinimaxFunction.Minimax(currentBoard, false, 4);
+
+            CheckerStep step = (CheckerStep)output.steps[0];
+
+            SelectChecker(step.StartIndex);
+            SelectTile(step.EndIndex);
         }
 
     }
