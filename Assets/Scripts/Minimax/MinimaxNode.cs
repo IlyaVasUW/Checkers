@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Minimax
 {
@@ -10,7 +6,7 @@ namespace Minimax
     {
         public MinimaxNode() { }
 
-        public abstract MinimaxNode[] GetChildren();
+        public abstract List<MinimaxNode> GetChildren();
         public abstract double GetScore();
         public abstract MinimaxStep GetPathToChild(MinimaxNode child);
     }

@@ -2,6 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+
+using Minimax;
+
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Experimental.GlobalIllumination;
@@ -11,6 +14,9 @@ public class GameController : MonoBehaviour
     public Dictionary<int, GameObject> tiles;
     public CheckerColor colorToMove;
 
+    bool useAI;
+    CheckerColor aiColor;
+
     int[] highlightedTiles;
     int selectedID;
     Transform deadCheckers;
@@ -18,6 +24,8 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        useAI = false;
+        aiColor = CheckerColor.RED;
         colorToMove = CheckerColor.BLACK;
         selectedID = -1;
         highlightedTiles = new int[0];
@@ -28,12 +36,38 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (useAI && colorToMove == aiColor)
+        {
+            CheckerTile[] currentTiles = new CheckerTile[64];
+
+            for (int i = 0; i < 64; i++)
+            {
+                if (tiles[i].transform.childCount > 0)
+                {
+                    CheckerData checkerData = tiles[i].transform.GetChild(0).GetComponent<CheckerData>();
+                    currentTiles[i] = new CheckerTile(new Checker() 
+                    {
+                        Color = checkerData.color,
+                        Promoted = checkerData.promoted,
+                        Dead = checkerData.dead
+                    }, i);
+                }
+                else
+                {
+                    currentTiles[i] = new CheckerTile(i);
+                }
+            }
+
+            CheckerBoard currentBoard = new CheckerBoard(currentTiles, colorToMove);
+
+            MinimaxFunction.Minimax(currentBoard, false, 9);
+        }
+
     }
 
     public void SelectChecker(int tileID)
     {
-        if (isCaptureInEffect) //prevent clicking off cpaturing checker
+        if (isCaptureInEffect) //prevent clicking off cpaturing Checker
         {
             return;
         }
@@ -62,7 +96,7 @@ public class GameController : MonoBehaviour
     public void SelectTile(int tileID)
     {
         bool tileID_is_valid_move = false;
-        if (selectedID != -1) // prev clicked tile has a checker piece
+        if (selectedID != -1) // prev clicked tile has a Checker piece
         {
             Transform checker = tiles[selectedID].transform.GetChild(0);
             int[] validTiles = GenerateValidMoves(selectedID);
@@ -210,7 +244,7 @@ public class GameController : MonoBehaviour
             }
             return ret;
         }
-        else //non promoted checker movement rules
+        else //non Promoted Checker movement rules
         {
             int leftMove = GenerateOffsetUnpromotedMove(7, factor, checkerData, tileID);
             int rightMove = GenerateOffsetUnpromotedMove(9, factor, checkerData, tileID);
@@ -264,7 +298,7 @@ public class GameController : MonoBehaviour
         int prevMove = tileID;
         bool foundEnd = false;
         int foundID = -1;
-        while (!foundEnd) //continue down diagnol until out of bounds or found a checker piece
+        while (!foundEnd) //continue down diagnol until out of bounds or found a Checker piece
         {
             foundID = GenerateOffsetUnpromotedMove(offset, factor, checkerData, prevMove);
             if (foundID != -1) //found a piece may continue while loop
@@ -374,21 +408,21 @@ public class GameController : MonoBehaviour
         return id;
     }
 
-    //use for any diagnol capture (forward, backward, long, or short)
+    //use for any diagonal capture (forward, backward, long, or short)
     //assumes the move input is a valid move
-    //assumes only one checker can be captured at a time
-    //also returns captured checker transform if there is a capture
+    //assumes only one Checker can be captured at a time
+    //also returns captured Checker transform if there is a capture
     Transform IsMoveCapture(int startTileID, int endTileID)
     {
         CheckerColor movingCheckerColor;
-        //checking color of moving checker
+        //checking Color of moving Checker
         if (tiles[startTileID].transform.childCount != 0)
         {
             movingCheckerColor = tiles[startTileID].transform.GetChild(0).GetComponent<CheckerData>().color;
         }
         else
         {
-            return null; //there is no checker on the starting tile
+            return null; //there is no Checker on the starting tile
         }
 
         int factor = 1;
@@ -417,16 +451,16 @@ public class GameController : MonoBehaviour
                 if (tiles[curID].transform.childCount > 0) //something is being blocking diagonal
                 {
                     Transform checkerTransform = tiles[curID].transform.GetChild(0);
-                    if (checkerTransform.GetComponent<CheckerData>().color != movingCheckerColor) //checker is opposite of starting color
+                    if (checkerTransform.GetComponent<CheckerData>().color != movingCheckerColor) //Checker is opposite of starting Color
                     {
                         if (captured == true) //attempting to capture a second piece, invalid move
                         {
                             return null;
                         }
-                        capturedChecker = checkerTransform; //return pointer to checker that will be captured
+                        capturedChecker = checkerTransform; //return pointer to Checker that will be captured
                         captured = true;
                     }
-                    else //checker is same as starting color, invalid move
+                    else //Checker is same as starting Color, invalid move
                     {
                         return null;
                     }
@@ -451,16 +485,16 @@ public class GameController : MonoBehaviour
                 if (tiles[curID].transform.childCount > 0) //something is being captured
                 {
                     Transform checkerTransform = tiles[curID].transform.GetChild(0);
-                    if (checkerTransform.GetComponent<CheckerData>().color != movingCheckerColor) //checker is opposite of starting color
+                    if (checkerTransform.GetComponent<CheckerData>().color != movingCheckerColor) //Checker is opposite of starting Color
                     {
                         if (captured == true) //attempting to capture a second piece, invalid move
                         {
                             return null;
                         }
-                        capturedChecker = checkerTransform; //return pointer to checker that will be captured
+                        capturedChecker = checkerTransform; //return pointer to Checker that will be captured
                         captured = true;
                     }
-                    else //checker is same as starting color, invalid move
+                    else //Checker is same as starting Color, invalid move
                     {
                         return null;
                     }

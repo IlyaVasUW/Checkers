@@ -1,69 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Minimax
 {
-    public class MinimaxFunction
+    public static class MinimaxFunction
     {
-        public readonly double MINIMUM = Double.MinValue;
-        public readonly double MAXIMUM = Double.MaxValue;
-        public MinimaxOutput Minimax(MinimaxNode node, bool maximize, int depth, double alpha, double beta, MinimaxStep[] steps)
+        public const double MINIMUM = Double.MinValue;
+        public const double MAXIMUM = Double.MaxValue;
+
+        public static MinimaxOutput Minimax(MinimaxNode node, bool maximize, int depth, double alpha = MINIMUM, double beta = MAXIMUM, List<MinimaxStep>? steps = null)
         {
-            MinimaxNode[] children = node.GetChildren();
-            if(depth == 0 || children.Length == 0)
+            steps ??= new();
+
+            List<MinimaxNode> children = node.GetChildren();
+
+            if (depth == 0 || children.Count == 0)
             {
                 return new MinimaxOutput(node.GetScore(), steps);
             }
 
-            MinimaxStep[] retSteps = { };
+            List<MinimaxStep> retSteps = steps.Take(steps.Count).ToList();
 
             double best = maximize ? MINIMUM : MAXIMUM;
 
-            foreach(MinimaxNode child in children)
+            foreach (MinimaxNode child in children)
             {
                 MinimaxStep newStep = node.GetPathToChild(child);
-                MinimaxStep[] newSteps = (MinimaxStep[])steps.Clone();
-                newSteps.Append(newStep);
+                List<MinimaxStep> newSteps = steps.Take(steps.Count).ToList();
+                newSteps.Add(newStep);
 
                 MinimaxOutput output = Minimax(child, !maximize, depth - 1, alpha, beta, newSteps);
+                newSteps = output.steps.Take(output.steps.Count).ToList();
 
-                if(maximize)
+                best = maximize ? Math.Max(best, output.score) : Math.Min(best, output.score);
+
+                if (best == output.score)
                 {
-                    best = best >= output.score ? best : output.score;
-                    alpha = best >= alpha ? best : alpha;
-                } else
-                {
-                    best = best <= output.score ? best : output.score; ;
-                    beta = best <= beta ? best : beta;
+                    retSteps = newSteps.Take(newSteps.Count).ToList();
                 }
 
-                if(best == output.score)
-                {
-                    retSteps = (MinimaxStep[])newSteps.Clone();
-                }
-
-                if(beta <= alpha)
+                if ((maximize && best > beta) || (!maximize && best < alpha))
                 {
                     break;
+                }
+
+                if (maximize)
+                {
+                    alpha = Math.Max(alpha, best);
+                }
+                else
+                {
+                    beta = Math.Min(beta, best);
                 }
             }
 
             return new MinimaxOutput(best, retSteps);
-        }
-    }
-
-    public class MinimaxOutput
-    {
-        public double score;
-        public MinimaxStep[] steps;
-
-        public MinimaxOutput(double score, MinimaxStep[] steps)
-        {
-            this.score = score;
-            this.steps = steps;
         }
     }
 }
