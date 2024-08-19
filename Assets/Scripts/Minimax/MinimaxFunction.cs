@@ -9,8 +9,10 @@ namespace Minimax
         public const double MINIMUM = Double.MinValue;
         public const double MAXIMUM = Double.MaxValue;
 
+#nullable enable
         public static MinimaxOutput Minimax(MinimaxNode node, bool maximize, int depth, double alpha = MINIMUM, double beta = MAXIMUM, List<MinimaxStep>? steps = null)
         {
+#nullable disable
             steps ??= new();
 
             List<MinimaxNode> children = node.GetChildren();
@@ -30,7 +32,16 @@ namespace Minimax
                 List<MinimaxStep> newSteps = steps.Take(steps.Count).ToList();
                 newSteps.Add(newStep);
 
-                MinimaxOutput output = Minimax(child, !maximize, depth - 1, alpha, beta, newSteps);
+                var nextMaximize = !maximize;
+
+                if (child is CheckerBoard)
+                {
+                    nextMaximize = (child as CheckerBoard).CurrentPlayer == CheckerColor.BLACK;
+                }
+
+
+                
+                MinimaxOutput output = Minimax(child, nextMaximize, depth - 1, alpha, beta, newSteps);
                 newSteps = output.steps.Take(output.steps.Count).ToList();
 
                 best = maximize ? Math.Max(best, output.score) : Math.Min(best, output.score);

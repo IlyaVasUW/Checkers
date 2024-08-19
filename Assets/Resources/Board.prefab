@@ -104,7 +104,7 @@ MonoBehaviour:
   Checker: {fileID: 70438903412605158, guid: 77ff4825bb5eb1048aa21c768312434e, type: 3}
   tileColor: {r: 0.9528302, g: 0.8039784, b: 0.644209, a: 1}
   highlightColor: {r: 1, g: 1, b: 0.39215687, a: 1}
-  colorScale: 4
+  colorScale: 2.5
 --- !u!114 &3802380482025741140
 MonoBehaviour:
   m_ObjectHideFlags: 0

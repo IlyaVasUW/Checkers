@@ -10,7 +10,7 @@ public class BoardTileGenerator : MonoBehaviour
     [SerializeField] public GameObject Checker;
     public Color tileColor = new Color(255, 255, 255);
     public Color highlightColor = new Color(255, 255, 100);
-    public int colorScale = 3;
+    public float colorScale = 1.2f;
     private GameController gameController;
 
     void Awake()

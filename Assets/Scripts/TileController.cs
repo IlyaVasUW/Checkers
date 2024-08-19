@@ -9,10 +9,10 @@ public class TileController : MonoBehaviour
     public TileColor color;
     public Color baseColor;
     public Color highlightColor;
-    public int colorScale;
+    public float colorScale;
 
     SpriteRenderer spriteRenderer;
-    int highlightScale;
+    float highlightScale;
     // Start is called before the first frame update
     void Start()
     {

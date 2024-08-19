@@ -32,18 +32,24 @@ class CheckerStep : MinimaxStep
 {
     public int StartIndex;
     public int EndIndex;
+    public bool IsCapture;
+    public CheckerColor PlayerColor;
 
-    public CheckerStep(int startIndex, int endIndex)
+    public CheckerStep(int startIndex, int endIndex, bool isCapture, CheckerColor playerColor)
     {
         StartIndex = startIndex;
         EndIndex = endIndex;
+        IsCapture = isCapture;
+        PlayerColor = playerColor;
     }
 }
 
 class CheckerBoard : MinimaxNode
 {
     CheckerTile[] tiles = new CheckerTile[64];
-    CheckerColor currentPlayer = CheckerColor.BLACK;
+    public CheckerColor CurrentPlayer = CheckerColor.BLACK;
+    public bool prevMoveCapture = false;
+    public int prevMoveEndIndex = -1;
     public CheckerBoard()
     {
         // Initialize the board
@@ -52,16 +58,76 @@ class CheckerBoard : MinimaxNode
     public CheckerBoard(CheckerTile[] tiles, CheckerColor currentPlayer)
     {
         this.tiles = tiles;
-        this.currentPlayer = currentPlayer;
+        this.CurrentPlayer = currentPlayer;
     }
 
     public override List<MinimaxNode> GetChildren()
     {
+
         var children = new List<MinimaxNode>();
+
+        if (prevMoveCapture && tiles[prevMoveEndIndex].Checker.Color == CurrentPlayer)
+        {
+            var tile = tiles[prevMoveEndIndex];
+
+            int[] validMoves = GenerateValidMoves(tile.Index);
+
+            if (validMoves.Length != 0)
+            {
+                foreach (int move in validMoves)
+                {
+                    var capture = IsMoveCapture(tile.Index, move);
+
+                    CheckerTile[] newTiles = new CheckerTile[tiles.Length];
+                    for (int i = 0; i < tiles.Length; i++)
+                    {
+                        newTiles[i] = new CheckerTile(tiles[i].Checker, tiles[i].Index);
+                    }
+
+                    if (capture != null)
+                    {
+                        newTiles[capture.Index].Checker = null;
+                    }
+
+                    newTiles[tile.Index].Checker = null;
+                    newTiles[move].Checker = new Checker
+                    {
+                        Color = tile.Checker.Color,
+                        Promoted = tile.Checker.Promoted,
+                        Dead = false
+                    };
+
+                    if (move / 8 == 7 || move / 8 == 0)
+                    {
+                        newTiles[move].Checker.Promoted = true;
+                    }
+
+                    CheckerColor nextPlayer = capture != null
+                        ? CurrentPlayer
+                        : (CurrentPlayer == CheckerColor.BLACK
+                            ? CheckerColor.RED
+                            : CheckerColor.BLACK);
+
+                    var newChild = new CheckerBoard(newTiles, nextPlayer)
+                    {
+                        prevMoveCapture = capture != null,
+                        prevMoveEndIndex = move
+                    };
+
+                    if (capture != null && newChild.GenerateValidMoves(move).Length == 0 && newChild.GetNumBlackCheckers() > 0 && newChild.GetNumRedCheckers() > 0)
+                    {
+                        newChild.CurrentPlayer = newChild.CurrentPlayer == CheckerColor.RED ? CheckerColor.BLACK : CheckerColor.RED;
+                    }
+
+                    children.Add(newChild);
+                }
+                return children;
+            }
+        }
 
         foreach (var tile in tiles)
         {
-            if (tile.Checker == null || tile.Checker.Color != currentPlayer)
+            if (tile.Checker == null || tile.Checker.Color != CurrentPlayer)
             {
                 continue;
             }
@@ -95,9 +161,23 @@ class CheckerBoard : MinimaxNode
                     newTiles[move].Checker.Promoted = true;
                 }
 
-                CheckerColor nextPlayer = currentPlayer == CheckerColor.BLACK ? CheckerColor.RED : CheckerColor.BLACK;
+                CheckerColor nextPlayer = capture != null 
+                    ? CurrentPlayer 
+                    : (CurrentPlayer == CheckerColor.BLACK 
+                        ? CheckerColor.RED 
+                        : CheckerColor.BLACK);
+                var newChild = new CheckerBoard(newTiles, nextPlayer)
+                {
+                    prevMoveCapture = capture != null,
+                    prevMoveEndIndex = move
+                };
 
-                children.Add(new CheckerBoard(newTiles, nextPlayer));
+                if (capture != null && newChild.GenerateValidMoves(move).Length == 0 && newChild.GetNumBlackCheckers() > 0 && newChild.GetNumRedCheckers() > 0)
+                {
+                    newChild.CurrentPlayer = newChild.CurrentPlayer == CheckerColor.RED ? CheckerColor.BLACK : CheckerColor.RED;
+                }
+
+                children.Add(newChild);
             }
         }
 
@@ -110,12 +190,15 @@ class CheckerBoard : MinimaxNode
 
         int startIndex = -1;
         int endIndex = -1;
+        bool isCapture = 
+            GetNumBlackCheckers() != childBoard.GetNumBlackCheckers()
+            || GetNumRedCheckers() != childBoard.GetNumRedCheckers();
 
         for (int i = 0; i < tiles.Length; i++)
         {
             if (tiles[i].Checker != null && childBoard.tiles[i].Checker == null)
             {
-                if (tiles[i].Checker.Color != currentPlayer)
+                if (tiles[i].Checker.Color != CurrentPlayer)
                 {
                     continue;
                 } else
@@ -130,7 +213,7 @@ class CheckerBoard : MinimaxNode
             }
         }
 
-        return new CheckerStep(startIndex, endIndex);
+        return new CheckerStep(startIndex, endIndex, isCapture, CurrentPlayer);
     }
 
     public int GetNumBlackCheckers()

@@ -38,7 +38,7 @@ public class GameController : MonoBehaviour
     {
         if (useAI && colorToMove == aiColor)
         {
-            Debug.Log("AI is thinking...");
+            // Debug.Log("AI is thinking...");
             CheckerTile[] currentTiles = new CheckerTile[64];
 
             for (int i = 0; i < 64; i++)
@@ -61,12 +61,17 @@ public class GameController : MonoBehaviour
 
             CheckerBoard currentBoard = new CheckerBoard(currentTiles, colorToMove);
 
-            var output = MinimaxFunction.Minimax(currentBoard, false, 4);
+            var output = MinimaxFunction.Minimax(currentBoard, false, 5);
 
+            int stepIndex = 0;
             CheckerStep step = (CheckerStep)output.steps[0];
-
-            SelectChecker(step.StartIndex);
-            SelectTile(step.EndIndex);
+            do
+            {
+                // Debug.Log($"Start: {step.StartIndex}\nEnd: {step.EndIndex}\nColor: {step.PlayerColor}\nCapture: {step.IsCapture}");
+                SelectChecker(step.StartIndex);
+                SelectTile(step.EndIndex);
+                step = (CheckerStep)output.steps[++stepIndex];
+            } while (step.PlayerColor == aiColor);
         }
 
     }
