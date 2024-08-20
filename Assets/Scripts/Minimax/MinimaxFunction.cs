@@ -17,6 +17,8 @@ namespace Minimax
 
             List<MinimaxNode> children = node.GetChildren();
 
+            children.Sort();
+
             if (depth == 0 || children.Count == 0)
             {
                 return new MinimaxOutput(node.GetScore(), steps);

@@ -114,7 +114,7 @@ class CheckerBoard : MinimaxNode
                         prevMoveEndIndex = move
                     };
 
-                    if (capture != null && newChild.GenerateValidMoves(move).Length == 0 && newChild.GetNumBlackCheckers() > 0 && newChild.GetNumRedCheckers() > 0)
+                    if (capture != null && newChild.GenerateValidMoves(move).Length == 0 && newChild.GetNumCheckersOfColor(CheckerColor.BLACK) > 0 && newChild.GetNumCheckersOfColor(CheckerColor.RED) > 0)
                     {
                         newChild.CurrentPlayer = newChild.CurrentPlayer == CheckerColor.RED ? CheckerColor.BLACK : CheckerColor.RED;
                     }
@@ -172,7 +172,7 @@ class CheckerBoard : MinimaxNode
                     prevMoveEndIndex = move
                 };
 
-                if (capture != null && newChild.GenerateValidMoves(move).Length == 0 && newChild.GetNumBlackCheckers() > 0 && newChild.GetNumRedCheckers() > 0)
+                if (capture != null && newChild.GenerateValidMoves(move).Length == 0 && newChild.GetNumCheckersOfColor(CheckerColor.BLACK) > 0 && newChild.GetNumCheckersOfColor(CheckerColor.RED) > 0)
                 {
                     newChild.CurrentPlayer = newChild.CurrentPlayer == CheckerColor.RED ? CheckerColor.BLACK : CheckerColor.RED;
                 }
@@ -191,8 +191,8 @@ class CheckerBoard : MinimaxNode
         int startIndex = -1;
         int endIndex = -1;
         bool isCapture = 
-            GetNumBlackCheckers() != childBoard.GetNumBlackCheckers()
-            || GetNumRedCheckers() != childBoard.GetNumRedCheckers();
+            GetNumCheckersOfColor(CheckerColor.BLACK) != childBoard.GetNumCheckersOfColor(CheckerColor.BLACK)
+            || GetNumCheckersOfColor(CheckerColor.RED) != childBoard.GetNumCheckersOfColor(CheckerColor.RED);
 
         for (int i = 0; i < tiles.Length; i++)
         {
@@ -216,31 +216,32 @@ class CheckerBoard : MinimaxNode
         return new CheckerStep(startIndex, endIndex, isCapture, CurrentPlayer);
     }
 
-    public int GetNumBlackCheckers()
-    {
-        int numBlackCheckers = 0;
-        foreach (CheckerTile tile in tiles)
-        {
-            if (
-                tile.Checker != null
-                && tile.Checker.Color == CheckerColor.BLACK
-                && !tile.Checker.Dead
-                )
-            {
-                numBlackCheckers++;
-            }
-        }
-        return numBlackCheckers;
-    }
-
-    public int GetNumRedCheckers()
+    public int GetNumCheckersOfColor(CheckerColor color)
     {
         int numRedCheckers = 0;
         foreach (CheckerTile tile in tiles)
         {
             if (
                 tile.Checker != null
-                && tile.Checker.Color == CheckerColor.RED
+                && tile.Checker.Color == color
+                && !tile.Checker.Dead
+                )
+            {
+                numRedCheckers++;
+            }
+        }
+        return numRedCheckers;
+    }
+
+    public int GetNumPromotedCheckersOfColor(CheckerColor color)
+    {
+        int numRedCheckers = 0;
+        foreach (CheckerTile tile in tiles)
+        {
+            if (
+                tile.Checker != null
+                && tile.Checker.Color == color
+                && tile.Checker.Promoted
                 && !tile.Checker.Dead
                 )
             {
@@ -252,7 +253,8 @@ class CheckerBoard : MinimaxNode
 
     public override double GetScore()
     {
-        return GetNumBlackCheckers() - GetNumRedCheckers();
+        return (GetNumCheckersOfColor(CheckerColor.BLACK) + GetNumPromotedCheckersOfColor(CheckerColor.BLACK)) 
+            - (GetNumCheckersOfColor(CheckerColor.RED) + GetNumPromotedCheckersOfColor(CheckerColor.RED));
     }
 
     int[] GenerateValidMoves(int tileID)
@@ -557,5 +559,12 @@ class CheckerBoard : MinimaxNode
         }
 
         return capturedChecker;
+    }
+
+
+
+    public int CompareTo(CheckerBoard other)
+    {
+        return (int)((this.GetScore() - other.GetScore()) * 100);
     }
 }

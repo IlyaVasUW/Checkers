@@ -14,7 +14,10 @@ public class GameController : MonoBehaviour
     public Dictionary<int, GameObject> tiles;
     public CheckerColor colorToMove;
 
+    public const int MINIMAX_DEPTH = 4;
+
     bool useAI;
+    bool aiStarted = false;
     CheckerColor aiColor;
 
     int[] highlightedTiles;
@@ -36,8 +39,9 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (useAI && colorToMove == aiColor)
+        if (useAI && colorToMove == aiColor && !aiStarted)
         {
+            aiStarted = true;
             // Debug.Log("AI is thinking...");
             CheckerTile[] currentTiles = new CheckerTile[64];
 
@@ -61,19 +65,33 @@ public class GameController : MonoBehaviour
 
             CheckerBoard currentBoard = new CheckerBoard(currentTiles, colorToMove);
 
-            var output = MinimaxFunction.Minimax(currentBoard, false, 5);
+            var output = MinimaxFunction.Minimax(currentBoard, false, MINIMAX_DEPTH);
 
-            int stepIndex = 0;
-            CheckerStep step = (CheckerStep)output.steps[0];
-            do
+
+            if (output.steps.Count == 0)
             {
-                // Debug.Log($"Start: {step.StartIndex}\nEnd: {step.EndIndex}\nColor: {step.PlayerColor}\nCapture: {step.IsCapture}");
-                SelectChecker(step.StartIndex);
-                SelectTile(step.EndIndex);
-                step = (CheckerStep)output.steps[++stepIndex];
-            } while (step.PlayerColor == aiColor);
+                return;
+            }
+
+            StartCoroutine(MakeMoveAI(output.steps));
         }
 
+    }
+
+    private IEnumerator MakeMoveAI(List<MinimaxStep> steps)
+    {
+        int stepIndex = 0;
+        CheckerStep step = (CheckerStep)steps[0];
+        do
+        {
+            yield return new WaitForSeconds(0.5f);
+            // Debug.Log($"Start: {step.StartIndex}\nEnd: {step.EndIndex}\nColor: {step.PlayerColor}\nCapture: {step.IsCapture}");
+            SelectChecker(step.StartIndex);
+            SelectTile(step.EndIndex);
+            step = (CheckerStep)steps[++stepIndex];
+        } while (step.PlayerColor == aiColor && stepIndex < steps.Count - 1);
+        aiStarted = false;
+        yield break;
     }
 
     public void SelectChecker(int tileID)
